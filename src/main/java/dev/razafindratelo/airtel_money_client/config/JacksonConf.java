@@ -1,6 +1,5 @@
 package dev.razafindratelo.airtel_money_client.config;
 
-import static dev.razafindratelo.airtel_money_client.file.PackageUtils.getGrandparentPackage;
 import static org.owasp.encoder.Encode.forJava;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -74,7 +73,7 @@ import org.springframework.context.annotation.Primary;
 @InfraGenerated
 public class JacksonConf {
 
-  private static final String APPLICATION_BASE_PACKAGE = getGrandparentPackage(JacksonConf.class);
+  private static final String APPLICATION_BASE_PACKAGE = "dev.razafindratelo";
 
   /**
    * Creates the primary ObjectMapper bean with security hardening and feature configuration.

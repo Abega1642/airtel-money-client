@@ -1,4 +1,4 @@
-.PHONY: help build test format format-check clean docker-build docker-run docker-stop \
+.PHONY: help build test format format-check clean \
         deps compile jar install run dev ci-build ci-test ci-format ci-qodana ci-semgrep \
         qodana semgrep verify-image health-check lint test-unit test-integration \
         install-pipx install-semgrep
@@ -187,43 +187,6 @@ endif
 
 semgrep: install-semgrep ## Run Semgrep security scanning
 	@semgrep ci --config=auto --sarif --output=semgrep.sarif --verbose
-
-##@ Docker
-
-docker-build: ## Build Docker image
-	$(DOCKER) build -t $(IMAGE_NAME):$(IMAGE_TAG) .
-
-docker-build-cache: ## Build Docker image with buildx cache
-ifeq ($(DETECTED_OS),Windows)
-	$(DOCKER) buildx build --cache-from type=local,src=%TEMP%\.buildx-cache --cache-to type=local,dest=%TEMP%\.buildx-cache -t $(IMAGE_NAME):$(IMAGE_TAG) .
-else
-	$(DOCKER) buildx build \
-		--cache-from type=local,src=/tmp/.buildx-cache \
-		--cache-to type=local,dest=/tmp/.buildx-cache \
-		-t $(IMAGE_NAME):$(IMAGE_TAG) .
-endif
-
-verify-image: ## Verify Docker image contents and configuration
-	@echo "Verifying image exists:"
-	@$(DOCKER) images | grep $(IMAGE_NAME)
-	@echo "\nVerifying JAR file:"
-	@$(DOCKER) run --rm --entrypoint sh $(IMAGE_NAME):$(IMAGE_TAG) -c "ls -lh /app/app.jar"
-	@echo "\nVerifying Java version:"
-	@$(DOCKER) run --rm --entrypoint sh $(IMAGE_NAME):$(IMAGE_TAG) -c "java -version"
-
-docker-run: ## Run Docker container
-	$(DOCKER) run -d \
-		--name $(CONTAINER_NAME) \
-		-p $(PORT):8080 \
-		--env-file .env \
-		$(IMAGE_NAME):$(IMAGE_TAG)
-
-docker-stop: ## Stop and remove Docker container
-	@$(DOCKER) stop $(CONTAINER_NAME) 2>/dev/null || true
-	@$(DOCKER) rm $(CONTAINER_NAME) 2>/dev/null || true
-
-docker-logs: ## View container logs
-	$(DOCKER) logs -f $(CONTAINER_NAME)
 
 health-check: ## Check application health endpoint
 ifeq ($(DETECTED_OS),Windows)
