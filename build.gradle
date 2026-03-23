@@ -65,6 +65,7 @@ dependencies {
     testImplementation 'io.swagger.core.v3:swagger-annotations:2.2.45'
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.45'
 
+    implementation 'dev.razafindratelo:airtel-money-client-gen:1.0.0'
 }
 
 tasks.named('test') {
