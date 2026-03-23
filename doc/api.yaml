@@ -1,0 +1,107 @@
+openapi: 3.1.0
+info:
+  title: Title
+  description: Title
+  version: 1.0.0
+servers:
+  - url: https
+paths:
+  /:
+    get:
+      operationId: rootRedirect
+      tags:
+        - Docs
+      summary: Redirect root path to Swagger UI
+      responses:
+        302:
+          description: Redirects to /doc
+          headers:
+            Location:
+              description: URL to redirect
+              schema:
+                type: string
+                example: /doc
+  /ping:
+    get:
+      operationId: pong
+      tags:
+        - Health
+      summary: Check if the server is alive
+      responses:
+        200:
+          description: A message showing that the server is alive
+          content:
+            application/json:
+              schema:
+                type: string
+                example: pong
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          $ref: '#/components/schemas/DateTime'
+          description: When the error occurred
+        status:
+          type: integer
+          description: HTTP status code
+          example: 400
+        error:
+          type: string
+          description: HTTP status reason phrase
+          example: Bad Request
+        message:
+          type: string
+          description: Detailed error message
+          example: Validation failed
+        path:
+          type: string
+          description: Request path where error occurred
+          example: /path/of/the/endpoint
+        errorCode:
+          type: string
+          description: Application-specific error code
+          enum:
+            - AUTHORIZATION_DENIED
+            - ENTITY_NOT_FOUND
+            - CONSTRAINT_VIOLATION_ON_FIELDS
+            - TOKEN_UNIQUENESS_CONFLICT
+            - BAD_FORM
+            - MISSING_AUTHORIZATION
+            - INVALID_AUTHORIZATION_FORMAT
+            - INVALID_TOKEN
+            - TOKEN_NOT_FOUND
+            - USER_DEACTIVATED
+            - AUTHENTICATION_FAILED
+            - INTERNAL_SERVER_ERROR
+            - MISSING_REQUIRED_PARAMETER
+            - INVALID_PARAMETER
+            - MALFORMED_JSON
+            - METHOD_NOT_ALLOWED
+      required:
+        - timestamp
+        - status
+        - error
+        - message
+        - path
+    DateTime:
+      type: string
+      format: date-time
+      description: Date and time in ISO 8601 format (RFC 3339)
+      example: '2025-12-06T11:23:45Z'
+    UUID:
+      type: string
+      pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+      format: uuid
+      example: e6b5cc3e-eaaa-4cb3-912c-e059e983bb78
+    Dummy:
+      type: object
+      required:
+        - id
+        - description
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        description:
+          type: string
