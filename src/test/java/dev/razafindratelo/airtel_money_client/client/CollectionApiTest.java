@@ -44,11 +44,11 @@ class CollectionApiTest {
   @Mock private ApiClient apiClient;
   @Mock private RestClient.ResponseSpec responseSpec;
 
-  private CollectionApi collectionApi;
+  private CollectionApi subject;
 
   @BeforeEach
   void setUp() {
-    collectionApi = new CollectionApi(apiClient);
+    subject = new CollectionApi(apiClient);
   }
 
   private void stubInvokeAPI() {
@@ -67,7 +67,7 @@ class CollectionApiTest {
     doReturn(expected).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
     var result =
-        collectionApi.initiatePayment(
+        subject.initiatePayment(
             ACCEPT,
             CONTENT_TYPE,
             X_COUNTRY,
@@ -94,7 +94,7 @@ class CollectionApiTest {
     doReturn(response).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
     var result =
-        collectionApi.initiatePayment(
+        subject.initiatePayment(
             ACCEPT,
             CONTENT_TYPE,
             X_COUNTRY,
@@ -117,7 +117,7 @@ class CollectionApiTest {
     doReturn(response).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
     var result =
-        collectionApi.initiatePayment(
+        subject.initiatePayment(
             ACCEPT,
             CONTENT_TYPE,
             X_COUNTRY,
@@ -136,7 +136,7 @@ class CollectionApiTest {
         .when(responseSpec)
         .body(any(ParameterizedTypeReference.class));
 
-    collectionApi.initiatePayment(
+    subject.initiatePayment(
         ACCEPT,
         CONTENT_TYPE,
         X_COUNTRY,
@@ -169,7 +169,7 @@ class CollectionApiTest {
     doReturn(entity).when(responseSpec).toEntity(any(ParameterizedTypeReference.class));
 
     var result =
-        collectionApi.initiatePaymentWithHttpInfo(
+        subject.initiatePaymentWithHttpInfo(
             ACCEPT,
             CONTENT_TYPE,
             X_COUNTRY,
@@ -191,7 +191,7 @@ class CollectionApiTest {
     stubInvokeAPI();
 
     var result =
-        collectionApi.initiatePaymentWithResponseSpec(
+        subject.initiatePaymentWithResponseSpec(
             ACCEPT,
             CONTENT_TYPE,
             X_COUNTRY,
@@ -221,7 +221,7 @@ class CollectionApiTest {
         assertThrows(
             RestClientResponseException.class,
             () ->
-                collectionApi.initiatePayment(
+                subject.initiatePayment(
                     ACCEPT,
                     CONTENT_TYPE,
                     X_COUNTRY,
@@ -250,7 +250,7 @@ class CollectionApiTest {
         assertThrows(
             RestClientResponseException.class,
             () ->
-                collectionApi.initiatePayment(
+                subject.initiatePayment(
                     ACCEPT,
                     CONTENT_TYPE,
                     X_COUNTRY,
@@ -279,7 +279,7 @@ class CollectionApiTest {
         assertThrows(
             RestClientResponseException.class,
             () ->
-                collectionApi.initiatePayment(
+                subject.initiatePayment(
                     ACCEPT,
                     CONTENT_TYPE,
                     X_COUNTRY,
@@ -293,7 +293,7 @@ class CollectionApiTest {
   @Test
   void set_api_client_replaces_the_underlying_client_correctly() {
     var newClient = mock(ApiClient.class);
-    collectionApi.setApiClient(newClient);
-    assertSame(newClient, collectionApi.getApiClient());
+    subject.setApiClient(newClient);
+    assertSame(newClient, subject.getApiClient());
   }
 }

@@ -36,11 +36,11 @@ class AuthenticationApiTest {
   @Mock private ApiClient apiClient;
   @Mock private ResponseSpec responseSpec;
 
-  private AuthenticationApi authenticationApi;
+  private AuthenticationApi subject;
 
   @BeforeEach
   void setUp() {
-    authenticationApi = new AuthenticationApi(apiClient);
+    subject = new AuthenticationApi(apiClient);
   }
 
   private void stubInvokeAPI() {
@@ -58,7 +58,7 @@ class AuthenticationApiTest {
     stubInvokeAPI();
     doReturn(expected).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
-    var result = authenticationApi.getAccessToken(CONTENT_TYPE, ACCEPT, request);
+    var result = subject.getAccessToken(CONTENT_TYPE, ACCEPT, request);
 
     assertNotNull(result);
     assertEquals(expected.getAccessToken(), result.getAccessToken());
@@ -73,7 +73,7 @@ class AuthenticationApiTest {
     stubInvokeAPI();
     doReturn(expected).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
-    var result = authenticationApi.getAccessToken(CONTENT_TYPE, ACCEPT, aTokenRequest());
+    var result = subject.getAccessToken(CONTENT_TYPE, ACCEPT, aTokenRequest());
 
     assertEquals(TokenResponse.TokenTypeEnum.BEARER, result.getTokenType());
   }
@@ -91,8 +91,7 @@ class AuthenticationApiTest {
     stubInvokeAPI();
     doReturn(entity).when(responseSpec).toEntity(any(ParameterizedTypeReference.class));
 
-    var result =
-        authenticationApi.getAccessTokenWithHttpInfo(CONTENT_TYPE, ACCEPT, aTokenRequest());
+    var result = subject.getAccessTokenWithHttpInfo(CONTENT_TYPE, ACCEPT, aTokenRequest());
 
     assertEquals(HttpStatus.OK, result.getStatusCode());
     assertNotNull(result.getBody());
@@ -105,8 +104,7 @@ class AuthenticationApiTest {
   void get_access_token_with_response_spec_returns_raw_response_spec() {
     stubInvokeAPI();
 
-    var result =
-        authenticationApi.getAccessTokenWithResponseSpec(CONTENT_TYPE, ACCEPT, aTokenRequest());
+    var result = subject.getAccessTokenWithResponseSpec(CONTENT_TYPE, ACCEPT, aTokenRequest());
 
     assertNotNull(result);
     assertSame(responseSpec, result);
@@ -129,7 +127,7 @@ class AuthenticationApiTest {
     var thrown =
         assertThrows(
             RestClientResponseException.class,
-            () -> authenticationApi.getAccessToken(CONTENT_TYPE, ACCEPT, aTokenRequest()));
+            () -> subject.getAccessToken(CONTENT_TYPE, ACCEPT, aTokenRequest()));
 
     assertEquals(HttpStatus.UNAUTHORIZED.value(), thrown.getStatusCode().value());
   }
@@ -139,7 +137,7 @@ class AuthenticationApiTest {
     stubInvokeAPI();
     doReturn(aTokenResponse()).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
-    authenticationApi.getAccessToken(CONTENT_TYPE, ACCEPT, aTokenRequest());
+    subject.getAccessToken(CONTENT_TYPE, ACCEPT, aTokenRequest());
 
     verify(apiClient)
         .invokeAPI(
@@ -160,7 +158,7 @@ class AuthenticationApiTest {
   @Test
   void get_access_token_api_client_is_replaced_correctly_via_setter() {
     var newClient = mock(ApiClient.class);
-    authenticationApi.setApiClient(newClient);
-    assertSame(newClient, authenticationApi.getApiClient());
+    subject.setApiClient(newClient);
+    assertSame(newClient, subject.getApiClient());
   }
 }

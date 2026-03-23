@@ -5,12 +5,14 @@ import static dev.razafindratelo.airtel_money_client.client.AirtelMoneyClientTes
 import static dev.razafindratelo.airtel_money_client.client.AirtelMoneyClientTestFixtures.X_CURRENCY;
 import static dev.razafindratelo.airtel_money_client.client.AirtelMoneyClientTestFixtures.aBearerToken;
 import static dev.razafindratelo.airtel_money_client.client.AirtelMoneyClientTestFixtures.aTransactionEnquiryResponse;
+import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -20,7 +22,6 @@ import static org.mockito.Mockito.verify;
 import dev.razafindratelo.airtel_money_client.api.TransactionApi;
 import dev.razafindratelo.airtel_money_client.invoker.ApiClient;
 import dev.razafindratelo.airtel_money_client.model.TransactionStatus;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,11 +42,11 @@ class TransactionApiTest {
   @Mock private ApiClient apiClient;
   @Mock private RestClient.ResponseSpec responseSpec;
 
-  private TransactionApi transactionApi;
+  private TransactionApi subject;
 
   @BeforeEach
   void setUp() {
-    transactionApi = new TransactionApi(apiClient);
+    subject = new TransactionApi(apiClient);
   }
 
   private void stubInvokeAPI() {
@@ -68,14 +69,13 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_ts_status_returns_success_response_with_airtel_money_id() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
     var expected = aTransactionEnquiryResponse(txId, TransactionStatus.TS);
 
     stubInvokeAPI();
     doReturn(expected).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
-    var result =
-        transactionApi.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
+    var result = subject.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
 
     assertNotNull(result);
     assertNotNull(result.getData());
@@ -89,14 +89,13 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_tf_status_returns_failure_response() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
     var expected = aTransactionEnquiryResponse(txId, TransactionStatus.TF);
 
     stubInvokeAPI();
     doReturn(expected).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
-    var result =
-        transactionApi.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
+    var result = subject.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
 
     assertNotNull(result);
     assertNotNull(result.getData().getTransaction());
@@ -106,14 +105,13 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_tip_status_means_customer_has_not_responded_yet() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
     var expected = aTransactionEnquiryResponse(txId, TransactionStatus.TIP);
 
     stubInvokeAPI();
     doReturn(expected).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
-    var result =
-        transactionApi.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
+    var result = subject.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
 
     assertNotNull(result);
     assertNotNull(result.getData().getTransaction());
@@ -122,14 +120,13 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_ta_status_means_transaction_is_ambiguous_and_should_be_retried() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
     var expected = aTransactionEnquiryResponse(txId, TransactionStatus.TA);
 
     stubInvokeAPI();
     doReturn(expected).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
-    var result =
-        transactionApi.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
+    var result = subject.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
 
     assertNotNull(result);
     assertNotNull(result.getData().getTransaction());
@@ -138,14 +135,13 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_te_status_means_transaction_has_expired() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
     var expected = aTransactionEnquiryResponse(txId, TransactionStatus.TE);
 
     stubInvokeAPI();
     doReturn(expected).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
-    var result =
-        transactionApi.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
+    var result = subject.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
 
     assertNotNull(result);
     assertNotNull(result.getData().getTransaction());
@@ -154,20 +150,20 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_uses_correct_endpoint_path_with_transaction_id() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
 
     stubInvokeAPI();
     doReturn(aTransactionEnquiryResponse(txId, TransactionStatus.TS))
         .when(responseSpec)
         .body(any(ParameterizedTypeReference.class));
 
-    transactionApi.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
+    subject.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
 
     verify(apiClient)
         .invokeAPI(
             eq("/standard/v1/payments/{id}"),
             any(),
-            any(),
+            argThat(pathParams -> txId.equals(pathParams.get("id"))),
             any(),
             any(),
             any(),
@@ -181,14 +177,13 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_response_partner_id_matches_the_one_sent_at_initiation() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
     var expected = aTransactionEnquiryResponse(txId, TransactionStatus.TS);
 
     stubInvokeAPI();
     doReturn(expected).when(responseSpec).body(any(ParameterizedTypeReference.class));
 
-    var result =
-        transactionApi.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
+    var result = subject.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
 
     assertNotNull(result.getData().getTransaction());
     assertEquals(txId, result.getData().getTransaction().getId());
@@ -196,14 +191,14 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_with_http_info_returns_response_entity_with_200_and_body() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
     var entity = ResponseEntity.ok(aTransactionEnquiryResponse(txId, TransactionStatus.TS));
 
     stubInvokeAPI();
     doReturn(entity).when(responseSpec).toEntity(any(ParameterizedTypeReference.class));
 
     var result =
-        transactionApi.getTransactionStatusWithHttpInfo(
+        subject.getTransactionStatusWithHttpInfo(
             txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
 
     assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -215,12 +210,12 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_with_response_spec_returns_raw_response_spec_instance() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
 
     stubInvokeAPI();
 
     var result =
-        transactionApi.getTransactionStatusWithResponseSpec(
+        subject.getTransactionStatusWithResponseSpec(
             txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken());
 
     assertNotNull(result);
@@ -229,7 +224,7 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_propagates_404_when_transaction_id_does_not_exist() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
     var ex =
         new RestClientResponseException(
             "Not Found",
@@ -246,15 +241,14 @@ class TransactionApiTest {
         assertThrows(
             RestClientResponseException.class,
             () ->
-                transactionApi.getTransactionStatus(
-                    txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken()));
+                subject.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken()));
 
     assertEquals(HttpStatus.NOT_FOUND.value(), thrown.getStatusCode().value());
   }
 
   @Test
   void get_transaction_status_propagates_401_when_bearer_token_is_expired() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
     var ex =
         new RestClientResponseException(
             "Unauthorized",
@@ -271,7 +265,7 @@ class TransactionApiTest {
         assertThrows(
             RestClientResponseException.class,
             () ->
-                transactionApi.getTransactionStatus(
+                subject.getTransactionStatus(
                     txId, ACCEPT, X_COUNTRY, X_CURRENCY, "Bearer expired-token"));
 
     assertEquals(HttpStatus.UNAUTHORIZED.value(), thrown.getStatusCode().value());
@@ -279,7 +273,7 @@ class TransactionApiTest {
 
   @Test
   void get_transaction_status_propagates_408_on_read_timeout() {
-    var txId = UUID.randomUUID().toString();
+    var txId = randomUUID().toString();
     var ex =
         new RestClientResponseException(
             "Request Timeout",
@@ -296,8 +290,7 @@ class TransactionApiTest {
         assertThrows(
             RestClientResponseException.class,
             () ->
-                transactionApi.getTransactionStatus(
-                    txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken()));
+                subject.getTransactionStatus(txId, ACCEPT, X_COUNTRY, X_CURRENCY, aBearerToken()));
 
     assertEquals(HttpStatus.REQUEST_TIMEOUT.value(), thrown.getStatusCode().value());
   }
@@ -305,7 +298,7 @@ class TransactionApiTest {
   @Test
   void set_api_client_replaces_the_underlying_client_correctly() {
     var newClient = mock(ApiClient.class);
-    transactionApi.setApiClient(newClient);
-    assertSame(newClient, transactionApi.getApiClient());
+    subject.setApiClient(newClient);
+    assertSame(newClient, subject.getApiClient());
   }
 }
